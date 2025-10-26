@@ -13,20 +13,24 @@ declare global {
     var errorRangeHandlerDefaults: HandlerObject
 }
 /**
+    Runs the first function with a provided handler key matching the response status.
     @param res Response object
-    @param defaults HandlerObject
+    @param handlers HandlerObject
 */
-export const responseRangeHandler = <R extends unknown=unknown>(res: Response, defaults?: HandlerObject) => {
+export const responseRangeHandler = <R extends unknown=unknown>(res: Response, handlers?: HandlerObject) => {
     const status = res.status.toString() as keyof HandlerObject
-    if (!defaults){
-        defaults = globalThis.errorRangeHandlerDefaults
+    if (!handlers){
+        handlers = globalThis.errorRangeHandlerDefaults
     }
-    if (defaults[status]){
-        defaults[status](res)
+    if (handlers[status]){
+        handlers[status](res)
         return true;
     }
-    for (const i in defaults){
-        const funct = defaults[i as keyof typeof defaults]
+    for (const i in handlers){
+        if (/^\d\d\d$/.exec(i)){
+            continue
+        }
+        const funct = handlers[i as keyof typeof handlers]
         const [min, max] = (/\d\d\d-\d\d\d/.exec(i)
             ? i.split('-')
             : /\d\d#/.exec(i) && !!RegExp(`${i.substring(0,2)}\\d`).exec(status)
@@ -34,11 +38,11 @@ export const responseRangeHandler = <R extends unknown=unknown>(res: Response, d
                 : /\d##/.exec(i) && !!RegExp(`${i[0]}\\d\\d`).exec(status)
                     ? [`${i[0]}00`, `${i[0]}99`]
                     : /\d\d\d\+/.exec(i)
-                        ? [i]
+                        ? [i.substring(0,3)]
                         : /\d\d\d-/.exec(i)
-                            ? [undefined, i]
+                            ? [undefined, i.substring(0,3)]
                             : [undefined, undefined]).map<number|undefined>(v => v === undefined ? undefined : Number(v))
-        if (((min ?? true) && res.status >= min ) && ((max ?? true) && res.status <= max )){
+        if (((min == undefined) || res.status >= min ) && ((max == undefined) || res.status <= max )){
             funct(res)
             return true;
         }
