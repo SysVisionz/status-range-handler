@@ -1,0 +1,25 @@
+{
+  "name": "status-range-handler",
+  "version": "0.1.0",
+  "description": "Allows a user to handle error responses easily and quickly by categorizing standard responses by range",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "status",
+    "status_handling",
+    "handling",
+    "defaults",
+    "request",
+    "request_handling",
+    "requests"
+  ],
+  "author": "Colin Brennan",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "typescript": "^5.9.3"
+  }
+}
