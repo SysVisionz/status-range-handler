@@ -19,9 +19,6 @@
   "author": "Colin Brennan",
   "license": "ISC",
   "devDependencies": {
-    "@types/axios": "^0.9.36",
-    "@types/next": "^8.0.7",
-    "@types/node": "^24.9.1",
     "typescript": "^5.9.3"
   }
 }

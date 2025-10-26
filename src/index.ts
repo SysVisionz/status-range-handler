@@ -1,6 +1,3 @@
-import { NextResponse } from "next"
-
-type AxiosXHRConfig <R extends any = unknown> = Axios.AxiosXHR<R>
 /**
     @example 207 responses with exact status 207 will run this function
     300-404 responses with any status from 300 to 404 will run this function
@@ -9,7 +6,8 @@ type AxiosXHRConfig <R extends any = unknown> = Axios.AxiosXHR<R>
     400+ any response with a status greater than 400 will run this function
     400- any response with a status less than 400 will run this function
  */
-export type HandlerObject = {[Key in `\d\d\d` | `\d\d#` | `\d##` | `\d\d\d-\d\d\d` | `\d\d\d+` | `\d\d\d-`]: <R extends any = unknown>(res: Response | NextResponse | AxiosXHRConfig<R> ) => boolean}
+
+export type HandlerObject = {[Key in `\d\d\d` | `\d\d#` | `\d##` | `\d\d\d-\d\d\d` | `\d\d\d+` | `\d\d\d-`]: <R extends unknown = unknown>(res: Response) => boolean}
 
 declare global {
     var errorRangeHandlerDefaults: HandlerObject
@@ -18,7 +16,7 @@ declare global {
     @param res Response object
     @param defaults HandlerObject
 */
-export const responseRangeHandler = (res: Response, defaults?: HandlerObject) => {
+export const responseRangeHandler = <R extends unknown=unknown>(res: Response, defaults?: HandlerObject) => {
     const status = res.status.toString() as keyof HandlerObject
     if (!defaults){
         defaults = globalThis.errorRangeHandlerDefaults
