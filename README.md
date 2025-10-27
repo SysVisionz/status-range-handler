@@ -10,13 +10,13 @@ This module allows a user to handle error responses easily and quickly by catego
 HandlerObject = {<statusSelectorOrRange>: (res: Response) => boolean}
 ```
 
-This is important to the functionality of the module. There are several options to how you can set your status selectors. The following are examples of those styles and their behaviors:
-```207```- responses with exact status 207 will run this function
-```300-404``` responses with any status from 300 to 404 will run this function
-```40#``` responses with any status matching 40[0-9] will run this function
-```4##``` responses with any status matching 4[00-99] will run this function
-```400+``` any response with a status greater than 400 will run this function
-```400-``` any response with a status less than 400 will run this function
+This is important to the functionality of the module. There are several options to how you can set your status selectors. The following are examples of those styles and their behaviors:  
+```207```- responses with exact status 207 will run this function  
+```300-404``` responses with any status from 300 to 404 will run this function  
+```40#``` responses with any status matching 40[0-9] will run this function  
+```4##``` responses with any status matching 4[00-99] will run this function  
+```400+``` any response with a status greater than 400 will run this function  
+```400-``` any response with a status less than 400 will run this function  
 
 Note that this is the priority order. Only the first matching handler will be run.
 
