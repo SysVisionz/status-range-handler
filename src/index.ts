@@ -7,7 +7,7 @@
     400- any response with a status less than 400 will run this function
  */
 
-export type HandlerObject = {[Key in `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: <R extends unknown = unknown>(res: Response) => void}
+export type HandlerObject<R extends any[] = any[]> = {[Key in `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: (res: Response, ...args: R) => void}
 
 declare global {
     var errorRangeHandlerDefaults: HandlerObject
@@ -17,14 +17,13 @@ declare global {
     @param res Response object
     @param handlers HandlerObject
 */
-export const responseRangeHandler = <R extends unknown=unknown>(res: Response, handlers?: HandlerObject) => {
+export const responseRangeHandler = <R extends any[]>(res: Response, handlers?: HandlerObject, ...args: R) => {
     const status = res.status.toString() as keyof HandlerObject
     if (!handlers){
         handlers = globalThis.errorRangeHandlerDefaults
     }
     if (handlers[status]){
-        handlers[status](res)
-        return true;
+        return handlers[status](res, ...args)
     }
     for (const i in handlers){
         if (/^\d\d\d$/.exec(i)){
@@ -43,7 +42,7 @@ export const responseRangeHandler = <R extends unknown=unknown>(res: Response, h
                             ? [undefined, i.substring(0,3)]
                             : [undefined, undefined]).map<number|undefined>(v => v === undefined ? undefined : Number(v))
         if (((min == undefined) || res.status >= min ) && ((max == undefined) || res.status <= max )){
-            funct(res)
+            funct(res, ...args )
             return true;
         }
     }
