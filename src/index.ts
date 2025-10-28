@@ -7,7 +7,7 @@
     400- any response with a status less than 400 will run this function
  */
 
-export type HandlerObject = {[Key in `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: <R extends unknown = unknown>(res: Response) => boolean}
+export type HandlerObject = {[Key in `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: <R extends unknown = unknown>(res: Response) => void}
 
 declare global {
     var errorRangeHandlerDefaults: HandlerObject
