@@ -1,6 +1,6 @@
 {
   "name": "status-range-handler",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Allows a user to handle error responses easily and quickly by categorizing standard responses by range",
   "main": "dist/index.js",
   "scripts": {
