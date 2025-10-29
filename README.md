@@ -7,7 +7,7 @@ This module allows a user to handle error responses easily and quickly by catego
 
 ### the HandlerObject
 ```
-HandlerObject = {<statusSelectorOrRange>: (res: Response) => boolean}
+HandlerObject = {<statusSelectorOrRange>: (res: Response, ...args) => boolean}
 ```
 
 This is important to the functionality of the module. There are several options to how you can set your status selectors. The following are examples of those styles and their behaviors:  
@@ -26,5 +26,5 @@ Note that this is the priority order. Only the first matching handler will be ru
 #### ```init(HandlerObject)```
 This will generate your application defaults. When this is set, calling the core ```statusRangeHandler``` will use these as a fallback if the response status doesn't match any of those provided in its HandlerObject.
 
-#### ```statusRangeHandler(res: Response, handlers?: HandlerObject)```
+#### ```statusRangeHandler(res: Response, handlers?: HandlerObject, ...args)```
 This is the core function. It allows you to wrap the response object, combined with a HandlerObject, and runs the functionality with the provided HandlerObject. If the response status matches none of the handler keys, it will then fall back to the default global handlers. If it is also not matched in the global handlers, no handling will occur, so make sure you're accounting for that.
