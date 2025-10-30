@@ -2,9 +2,15 @@
   "name": "status-range-handler",
   "version": "0.2.1",
   "description": "Allows a user to handle error responses easily and quickly by categorizing standard responses by range",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "cjs/index.js",
+  "exports": {
+    "require": "./cjs/index.js",
+    "import": "./esm/index.js"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc --module commonjs --outdir cjs/ && npm run build-packages",
+    "build-packages": "echo '{\"type\": \"module\"}' > esm/package.json && echo '{\"type\": \"commonjs\"}' > cjs/package.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
