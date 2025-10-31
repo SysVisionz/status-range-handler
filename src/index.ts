@@ -7,7 +7,7 @@
     400- any response with a status less than 400 will run this function
  */
 
-export type HandlerObject<R extends any[] = any[]> = {[Key in 'ok' | 'error' | `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: (res: Response, ...args: R) => void}
+export type HandlerObject<R extends any[] = any[]> = {[Key in 'ok' | 'error' | `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: (res: Response, ...args: R) => boolean}
 
 declare global {
     var errorRangeHandlerDefaults: HandlerObject
@@ -17,19 +17,42 @@ declare global {
     @param res Response object
     @param handlers HandlerObject
 */
-export const responseRangeHandler = <R extends any[]>(res: Response, handlers?: HandlerObject, ...args: R) => {
+export function responseRangeHandler<R extends any[] = any[]>(res: Response, handlers?: HandlerObject, ...args: R): boolean
+export function responseRangeHandler<R extends {[K: string]: any} = {[K: string]: any}>(res: Response, options: {
+    handlers?: HandlerObject
+} & R): boolean
+export function responseRangeHandler<R extends any[] = any[]>(res: Response, ...args: R): boolean
+export function responseRangeHandler<R extends any[] | {[K: string]: any}>(res: Response, handlersOrOptions?: any, ...argu: typeof handlersOrOptions extends HandlerObject ? any[] : never): boolean {
+    let handlers: HandlerObject | undefined
+    let args: R
+    let argsObject: boolean
+    if (handlersOrOptions && typeof handlersOrOptions === 'object'){
+        if ((handlersOrOptions as { handlers?: HandlerObject} & R).handlers) {
+            const {handlers: theHandlers, ...theArgs} = handlersOrOptions as { handlers?: HandlerObject} & R;
+            handlers = theHandlers;
+            args = theArgs as R;
+            argsObject = true;
+        } else if (Object.keys(handlersOrOptions).every(v => /(\d##|\d\d#|\d\d\d|\d\d\d\+|\d\d\d-|\d\d\d-\d\d\d|ok|error)/.test(v))) {
+            handlers = handlersOrOptions as HandlerObject
+            args = argu as unknown as R
+            argsObject = false;
+        }
+    }
+    else {
+        args = [handlersOrOptions, ...argu] as R
+    }
     const status = res.status.toString() as keyof HandlerObject
     if (!handlers){
         handlers = globalThis.errorRangeHandlerDefaults
     }
     if (handlers[status]){
-        return handlers[status](res, ...args)
+        return handlers[status](res, ...(argsObject ? [args] as [{[key: string]: string}] : args as any[]))
     }
     if (handlers.ok && res.ok) {
-        return handlers.ok(res, ...args)
+        return handlers.ok(res, ...(argsObject ? [args] as [{[key: string]: string}] : args as any[]))
     }
     if (handlers.error && !res.ok){
-        return handlers.error(res, ...args)
+        return handlers.error(res, ...(argsObject ? [args] as [{[key: string]: string}] : args as any[]))
     }
     for (const i in handlers){
         if (/^\d\d\d$/.exec(i)){
@@ -46,9 +69,13 @@ export const responseRangeHandler = <R extends any[]>(res: Response, handlers?: 
                         ? [i.substring(0,3)]
                         : /\d\d\d-/.exec(i)
                             ? [undefined, i.substring(0,3)]
-                            : [undefined, undefined]).map<number|undefined>(v => v === undefined ? undefined : Number(v))
-        if (((min == undefined) || res.status >= min ) && ((max == undefined) || res.status <= max )){
-            funct(res, ...args )
+                            : i === 'ok'
+                                ? [200, 299]
+                                : i === 'error'
+                                    ? [300]
+                                    : [undefined, undefined]).map<number|undefined>(v => v === undefined ? undefined : Number(v))
+        if ((min || max) && ((min == undefined) || res.status >= min ) && ((max == undefined) || res.status <= max )){
+            funct(res, ...(argsObject ? [args] as [{[key: string]: string}] : args as any[]) )
             return true;
         }
     }
