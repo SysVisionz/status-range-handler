@@ -7,7 +7,7 @@
     400- any response with a status less than 400 will run this function
  */
 
-export type HandlerObject<R extends any[] = any[]> = {[Key in `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: (res: Response, ...args: R) => void}
+export type HandlerObject<R extends any[] = any[]> = {[Key in 'ok' | 'error' | `${number}${number}${number}` | `${number}${number}#` | `${number}##` | `${number}${number}${number}-${number}${number}${number}` | `${number}${number}${number}+` | `${number}${number}${number}-`]: (res: Response, ...args: R) => void}
 
 declare global {
     var errorRangeHandlerDefaults: HandlerObject
@@ -24,6 +24,12 @@ export const responseRangeHandler = <R extends any[]>(res: Response, handlers?: 
     }
     if (handlers[status]){
         return handlers[status](res, ...args)
+    }
+    if (handlers.ok && res.ok) {
+        return handlers.ok(res, ...args)
+    }
+    if (handlers.error && !res.ok){
+        return handlers.error(res, ...args)
     }
     for (const i in handlers){
         if (/^\d\d\d$/.exec(i)){
