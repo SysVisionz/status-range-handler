@@ -1,6 +1,6 @@
 {
   "name": "status-range-handler",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Allows a user to handle error responses easily and quickly by categorizing standard responses by range",
   "type": "module",
   "main": "cjs/index.js",
